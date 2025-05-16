@@ -32,11 +32,13 @@ export const forgotPassword = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { email } = req.body;
-  const result = await forgotPasswordService(email);
+  const { email, origin } = req.body;
+  if (!origin) res.status(400).json({ message: "Client origin required" });
+  const result = await forgotPasswordService(email, origin);
+  console.log(result, "result of forgot password");
 
   if (result.success) {
-    res.status(200).json({ message: result.message });
+    res.status(200).json({ message: result.message, data: result.data });
   }
   res.status(400).json({ message: result.message });
 };

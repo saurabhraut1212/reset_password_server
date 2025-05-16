@@ -70,7 +70,8 @@ export const loginUser = async (data: LoginData): Promise<ServiceResult> => {
 };
 
 export const forgotPasswordService = async (
-  email: string
+  email: string,
+  origin: string
 ): Promise<ServiceResult> => {
   try {
     const user: IUser | null = await User.findOne({ email });
@@ -83,12 +84,16 @@ export const forgotPasswordService = async (
     user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
     await user.save();
 
-    const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
+    const resetLink = `${origin}/reset-password/${token}`;
     const html = `<p>Reset your password: <a href="${resetLink}">${resetLink}</a></p>`;
 
     await sendEmail(user.email, "Reset Password", html);
 
-    return { success: true, message: "Password reset email sent" };
+    return {
+      success: true,
+      message: "Password reset email sent",
+      data: token,
+    };
   } catch (error) {
     console.error(error);
     return { success: false, message: "Server error" };

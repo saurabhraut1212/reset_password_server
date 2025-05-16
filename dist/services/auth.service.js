@@ -61,7 +61,7 @@ const loginUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.loginUser = loginUser;
-const forgotPasswordService = (email) => __awaiter(void 0, void 0, void 0, function* () {
+const forgotPasswordService = (email, origin) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield User_model_1.User.findOne({ email });
         if (!user) {
@@ -71,10 +71,14 @@ const forgotPasswordService = (email) => __awaiter(void 0, void 0, void 0, funct
         user.resetToken = token;
         user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
         yield user.save();
-        const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
+        const resetLink = `${origin}/reset-password/${token}`;
         const html = `<p>Reset your password: <a href="${resetLink}">${resetLink}</a></p>`;
         yield (0, sendEmail_1.sendEmail)(user.email, "Reset Password", html);
-        return { success: true, message: "Password reset email sent" };
+        return {
+            success: true,
+            message: "Password reset email sent",
+            data: token,
+        };
     }
     catch (error) {
         console.error(error);

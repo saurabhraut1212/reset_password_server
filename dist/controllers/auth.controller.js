@@ -34,10 +34,13 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.login = login;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.body;
-    const result = yield (0, auth_service_1.forgotPasswordService)(email);
+    const { email, origin } = req.body;
+    if (!origin)
+        res.status(400).json({ message: "Client origin required" });
+    const result = yield (0, auth_service_1.forgotPasswordService)(email, origin);
+    console.log(result, "result of forgot password");
     if (result.success) {
-        res.status(200).json({ message: result.message });
+        res.status(200).json({ message: result.message, data: result.data });
     }
     res.status(400).json({ message: result.message });
 });
